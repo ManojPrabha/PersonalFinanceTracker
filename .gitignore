@@ -1,0 +1,11 @@
+/.idea/.gitignore
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/PersonalFinanceTracker.iml
+/.idea/vcs.xml
+/__pycache__/app.cpython-37.pyc
+/__pycache__/DataReadInput.cpython-37.pyc
+/__pycache__/settings.cpython-37.pyc
+*.xls
+/Sep2021.pdf

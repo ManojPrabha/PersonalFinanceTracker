@@ -18,13 +18,13 @@ import datetime
 import calendar
 import DataReadInput
 from st_aggrid import AgGrid, GridUpdateMode, JsCode
-from st_aggrid.grid_options_builder import GridOptionsBuiler
-OverallCategories = ['Salary','Entertainment', 'Food', 'Rent', \
-				  'PhoneBills', 'Travel', 'Transport', 'Sport', 'Transfer', 'Materialistic Desire',\
-				  'Cash Withdrawal', 'Gifts', 'Groceries', 'Personal care', 'Other', 'Lend', 'Loan',\
-				  'EMI', 'CarMaintainence', 'Others'
-				  ]
-###############################################################################
+from st_aggrid.grid_options_builder import GridOptionsBuilder
+OverallCategories = ['Salary', 'Savings','Entertainment', 'EatingOut', 'Rent', \
+				  'PhoneBills', 'Travel', 'Fuel', 'Sport', 'AccountTransfer', 'Shopping',\
+				  'Cash_Withdrawal', 'CreditCard_Debt_Payment', 'CreditCard_Maintainence',\
+				  'Gifts', 'Groceries', 'Personal care', 'Lend', 'Loan_EMI_Payment',\
+				  'EMI', 'CarMaintainence', 'Unknown']
+###############################################################################s
 #Create Table to add categories
 def CreateTableFromReport(ListDF, report_year, report_month_str):
 	st.subheader(f'Analytics for the given Month - {report_year} {report_month_str}')
@@ -32,17 +32,18 @@ def CreateTableFromReport(ListDF, report_year, report_month_str):
 	for index, row in ListDF.iterrows():
 		ListDF['Year'] = report_year
 		ListDF['Month'] = report_month_str
-		ListDF['Category'] = 'Others'
+		ListDF['  '] = 'Others'
+		ListDF['Category'] = 'Uncategorized'
 		print(row['Narration'])
 
 		# Personalise your categories
-		ListDF['Category'] = np.where(ListDF['Narration'].str.contains('Amazon|AMAZON|Amz'), 'Materialistic Desire',ListDF['Category']) #debit
+		ListDF['Category'] = np.where(ListDF['Narration'].str.contains('Amazon|AMAZON|Amz'), 'Shopping',ListDF['Category']) #debit
 
 		ListDF['Category'] = np.where(ListDF['Narration'].str.contains('Gym|GYM|Thenx|Footy|Sporting|MUTHURAAJ|WAYNERAJESH94|WARRIORS CROSS FIT'), 'Sport', ListDF['Category'])
 
 		ListDF['Category'] = np.where(ListDF['Narration'].str.contains('CREDIT INTEREST CAPITALISED'), 'CreditCard_Maintainence', ListDF['Category'])
 
-		ListDF['Category'] = np.where(ListDF['Narration'].str.contains('IB BILLPAY'), 'CreditCard_Debt', ListDF['Category'])
+		ListDF['Category'] = np.where(ListDF['Narration'].str.contains('IB BILLPAY'), 'CreditCard_Debt_Payment', ListDF['Category'])
 
 		ListDF['Category'] = np.where(ListDF['Narration'].str.contains('BOSCH GLOBAL SOFTWARE TECHNOLOGIES PRIVATE LIMITED'), 'Salary', ListDF['Category'])
 
@@ -64,7 +65,7 @@ def CreateTableFromReport(ListDF, report_year, report_month_str):
 
 	#ListDF.configure_column(“Category”, editable = True, cellEditor =‘agSelectCellEditor’, cellEditorParams = {‘values’: OverallCategories})
 	#st.write(ListDF)
-	gd = GridOptionsBuiler.from_dataframe(ListDF)
+	gd = GridOptionsBuilder.from_dataframe(ListDF)
 	gd.configure_pagination(enabled=True)
 	gd.configure_default_column(editable=True, groupable=True)
 	AgGrid(ListDF)
@@ -100,66 +101,61 @@ def CreateTreeMapPlotly(ListDF, report_year, report_month_str):
 
 ###############################################################################
 ##Webpage Setup
-# emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
-st.set_page_config(page_title="Personal Finance Tracker",
-	page_icon="🦈",
-	layout="wide")
+def main():
 
-##Sidebar Setup
-st.sidebar.title("Options")
 
-tabs = st.tabs(["Home", "AnalyseMontlyReport", "AnalyseYearlyReport"])
+	tabs = st.tabs(["Home", "AnalyseMontlyReport", "AnalyseYearlyReport"])
 
-with tabs[0]:
-	##MainWebpage Setup
-	st.title (":shark: Finance Dashboard")
-	st.caption("Welcome Manoj :)")
+	with tabs[0]:
+		##MainWebpage Setup
+		st.title (":shark: Finance Dashboard")
+		st.caption("Welcome Manoj :)")
 
-	#MonthlyReport= DataReadInput.ReadCsvMontlyReport("BS_December.txt")
+		#MonthlyReport= DataReadInput.ReadCsvMontlyReport("BS_December.txt")
 
-	#CreateAreaGraphPlotly(MonthlyReport)
+		#CreateAreaGraphPlotly(MonthlyReport)
 
-with tabs[1]:
-	##Montly Data Setup
-	st.title(":date: Analyse Montly Finance Data")
-	st.session_state.formbtn_state = True
+	with tabs[1]:
+		##Montly Data Setup
+		st.title(":date: Analyse Montly Finance Data")
+		st.session_state.formbtn_state = True
 
-	st.subheader("Add New Month Report")
-	# name = st.text_input("Name")
-	with st.form(key='Month'):
-		st.write('Add data to Analyse Month data')
+		st.subheader("Add New Month Report")
+		# name = st.text_input("Name")
+		with st.form(key='Month'):
+			st.write('Add data to Analyse Month data')
 
-		this_year = datetime.date.today().year
-		this_month = datetime.date.today().month
-		report_year = st.selectbox('', range(this_year, this_year - 5, -1))
-		month_abbr = calendar.month_abbr[1:]
-		report_month_str = st.radio('', month_abbr, index=this_month - 1, horizontal=True)
-		report_month = month_abbr.index(report_month_str) + 1
+			this_year = datetime.date.today().year
+			this_month = datetime.date.today().month
+			report_year = st.selectbox('', range(this_year, this_year - 5, -1))
+			month_abbr = calendar.month_abbr[1:]
+			report_month_str = st.radio('', month_abbr, index=this_month - 1, horizontal=True)
+			report_month = month_abbr.index(report_month_str) + 1
 
-		file = st.file_uploader('Upload the Monthly Report!! (DoubleCheck the report is not yearly!)')
+			file = st.file_uploader('Upload the Monthly Report!! (DoubleCheck the report is not yearly!)')
 
-		submit_form = st.form_submit_button(label="Analyse", help="Click Analyse to Submit Form!")
+			submit_form = st.form_submit_button(label="Analyse", help="Click Analyse to Submit Form!")
 
-		# Checking if all the fields are non empty
-		if submit_form:
-			st.write(submit_form)
+			# Checking if all the fields are non empty
+			if submit_form:
+				st.write(submit_form)
 
-			if file and report_month_str and report_year:
-				st.success(
-					f"Report is submitted and make take a while to process"
-				)
-				MonthlyReport = DataReadInput.ReadCsvMontlyReport(file)
-				#create a table
-				ListNewDF = CreateTableFromReport(MonthlyReport, report_year, report_month_str)
-				#create a Graph
-				CreateAreaGraphPlotly(ListNewDF, report_year, report_month_str)
-				# create a Tree Map for Categories
-				CreateTreeMapPlotly(ListNewDF, report_year, report_month_str)
+				if file and report_month_str and report_year:
+					st.success(
+						f"Report is submitted and make take a while to process"
+					)
+					MonthlyReport = DataReadInput.ReadCsvMontlyReport(file)
+					#create a table
+					ListNewDF = CreateTableFromReport(MonthlyReport, report_year, report_month_str)
+					#create a Graph
+					CreateAreaGraphPlotly(ListNewDF, report_year, report_month_str)
+					# create a Tree Map for Categories
+					CreateTreeMapPlotly(ListNewDF, report_year, report_month_str)
 
-			else:
-				st.warning("Please fill all the fields")
+				else:
+					st.warning("Please fill all the fields")
 
-with tabs[2]:
-	##Yearly Data Setup
-	st.title(":calendar: Analyse Yearly Finance Data")
+	with tabs[2]:
+		##Yearly Data Setup
+		st.title(":calendar: Analyse Yearly Finance Data")
 
